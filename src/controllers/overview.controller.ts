@@ -1,59 +1,84 @@
 import { Request, Response } from "express";
-import { IOverview } from "../interfaces/overview.interface";
+import pool from "../database";
 
-let overviews: IOverview[] = [];
-
-export const getAllOverviews = (req: Request, res: Response): void => {
-  res.json(overviews);
+export const getOverviews = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await pool.query("SELECT * FROM overviews");
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server xatosi" });
+  }
 };
 
-export const createOverview = (req: Request, res: Response): void => {
-  const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
-
-  if (!title || !Array.isArray(introduction) || !Array.isArray(conclusion)) {
-    res.status(400).json({ message: "Noto‘g‘ri ma'lumot formati!" });
-    return;
+export const getOverview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query("SELECT * FROM overviews WHERE id = $1", [id]);
+    if (result.rowCount === 0) {
+      res.status(404).json({ message: "Overview topilmadi" });
+      return;
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server xatosi" });
   }
-
-  const newOverview: IOverview = { title, introduction, conclusion, researchFocus, imageGallery };
-  overviews.push(newOverview);
-
-  res.status(201).json(newOverview);
 };
 
-export const getOverviewById = (req: Request, res: Response): void => {
-  const index = parseInt(req.params.id);
-  if (isNaN(index) || index < 0 || index >= overviews.length) {
-    res.status(404).json({ message: "Overview topilmadi" });
-    return;
+export const addOverview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO overviews (title, introduction, conclusion, researchFocus, imageGallery) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [title, introduction, conclusion, researchFocus, imageGallery]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server xatosi" });
   }
-  res.json(overviews[index]);
 };
 
-export const updateOverview = (req: Request, res: Response): void => {
-  const index = parseInt(req.params.id);
-  if (isNaN(index) || index < 0 || index >= overviews.length) {
-    res.status(404).json({ message: "Overview topilmadi" });
-    return;
-  }
+export const editOverview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
 
-  const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
-  if (!title || !Array.isArray(introduction) || !Array.isArray(conclusion)) {
-    res.status(400).json({ message: "Noto‘g‘ri ma'lumot formati!" });
-    return;
-  }
+    const result = await pool.query(
+      `UPDATE overviews SET title = $1, introduction = $2, conclusion = $3, researchFocus = $4, imageGallery = $5 
+       WHERE id = $6 RETURNING *`,
+      [title, introduction, conclusion, researchFocus, imageGallery, id]
+    );
 
-  overviews[index] = { title, introduction, conclusion, researchFocus, imageGallery };
-  res.json(overviews[index]);
+    if (result.rowCount === 0) {
+      res.status(404).json({ message: "Overview topilmadi" });
+      return;
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server xatosi" });
+  }
 };
 
-export const deleteOverview = (req: Request, res: Response): void => {
-  const index = parseInt(req.params.id);
-  if (isNaN(index) || index < 0 || index >= overviews.length) {
-    res.status(404).json({ message: "Overview topilmadi" });
-    return;
-  }
+export const removeOverview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query("DELETE FROM overviews WHERE id = $1", [id]);
 
-  overviews.splice(index, 1);
-  res.json({ message: "Overview o‘chirildi" });
+    if (result.rowCount === 0) {
+      res.status(404).json({ message: "Overview topilmadi" });
+      return;
+    }
+
+    res.json({ message: "Overview o‘chirildi" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server xatosi" });
+  }
 };

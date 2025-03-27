@@ -1,18 +1,12 @@
 import express from "express";
-import {
-  getAllOverviews,
-  createOverview,
-  getOverviewById,
-  updateOverview,
-  deleteOverview,
-} from "../controllers/overview.controller";
+import { getOverviews, getOverview, addOverview, editOverview, removeOverview } from "../controllers/overview.controller";
 
 const router = express.Router();
 
-router.get("/", getAllOverviews);        
-router.post("/", createOverview);       
-router.get("/:id", getOverviewById);    
-router.put("/:id", updateOverview);    
-router.delete("/:id", deleteOverview);  
+router.get("/", getOverviews);
+router.get("/:id", getOverview);
+router.post("/", addOverview);
+router.put("/:id", editOverview);
+router.delete("/:id", removeOverview);
 
 export default router;

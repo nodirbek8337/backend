@@ -1,4 +1,5 @@
 export interface IOverview {
+  id?: number;
   title: string;
   introduction: string[];
   conclusion: string[];
