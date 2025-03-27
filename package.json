@@ -1,11 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/server.js",
-    "dev": "nodemon --ext ts --exec ts-node src/server.ts"
+    "dev": "nodemon --ext ts --exec ts-node src/server.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
