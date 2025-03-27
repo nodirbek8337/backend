@@ -1,90 +1,59 @@
 import { Request, Response } from "express";
-import { Overview } from "../models/overview.model";
+import { IOverview } from "../interfaces/overview.interface";
 
-// 🔹 1. Barcha Overview larni olish
-export const getAllOverviews = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const overviews = await Overview.find();
-    res.json(overviews);
-  } catch (error) {
-    res.status(500).json({ message: "Serverda xatolik", error });
-  }
+let overviews: IOverview[] = [];
+
+export const getAllOverviews = (req: Request, res: Response): void => {
+  res.json(overviews);
 };
 
-// 🔹 2. Yangi Overview qo'shish
-export const createOverview = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
+export const createOverview = (req: Request, res: Response): void => {
+  const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
 
-    const newOverview = new Overview({
-      title,
-      introduction: introduction || [], 
-      conclusion: conclusion || [], 
-      researchFocus: researchFocus || [], 
-      imageGallery: imageGallery || [] 
-    });
-
-    await newOverview.save();
-    res.status(201).json(newOverview);
-  } catch (error) {
-    res.status(500).json({ message: "Serverda xatolik", error });
+  if (!title || !Array.isArray(introduction) || !Array.isArray(conclusion)) {
+    res.status(400).json({ message: "Noto‘g‘ri ma'lumot formati!" });
+    return;
   }
+
+  const newOverview: IOverview = { title, introduction, conclusion, researchFocus, imageGallery };
+  overviews.push(newOverview);
+
+  res.status(201).json(newOverview);
 };
 
-// 🔹 3. ID bo‘yicha bitta Overview ni olish
-export const getOverviewById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const overview = await Overview.findById(req.params.id);
-    if (!overview) {
-      res.status(404).json({ message: "Overview topilmadi" });
-      return;
-    }
-    res.json(overview);
-  } catch (error) {
-    res.status(500).json({ message: "Serverda xatolik", error });
+export const getOverviewById = (req: Request, res: Response): void => {
+  const index = parseInt(req.params.id);
+  if (isNaN(index) || index < 0 || index >= overviews.length) {
+    res.status(404).json({ message: "Overview topilmadi" });
+    return;
   }
+  res.json(overviews[index]);
 };
 
-// 🔹 4. Overview ni yangilash
-export const updateOverview = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
-
-    const updatedOverview = await Overview.findByIdAndUpdate(
-      req.params.id,
-      {
-        title,
-        introduction,
-        conclusion,
-        researchFocus,
-        imageGallery
-      },
-      { new: true }
-    );
-
-    if (!updatedOverview) {
-      res.status(404).json({ message: "Overview topilmadi" });
-      return;
-    }
-
-    res.json(updatedOverview);
-  } catch (error) {
-    res.status(500).json({ message: "Serverda xatolik", error });
+export const updateOverview = (req: Request, res: Response): void => {
+  const index = parseInt(req.params.id);
+  if (isNaN(index) || index < 0 || index >= overviews.length) {
+    res.status(404).json({ message: "Overview topilmadi" });
+    return;
   }
+
+  const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
+  if (!title || !Array.isArray(introduction) || !Array.isArray(conclusion)) {
+    res.status(400).json({ message: "Noto‘g‘ri ma'lumot formati!" });
+    return;
+  }
+
+  overviews[index] = { title, introduction, conclusion, researchFocus, imageGallery };
+  res.json(overviews[index]);
 };
 
-// 🔹 5. Overview ni o‘chirish
-export const deleteOverview = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const deletedOverview = await Overview.findByIdAndDelete(req.params.id);
-    
-    if (!deletedOverview) {
-      res.status(404).json({ message: "Overview topilmadi" });
-      return;
-    }
-
-    res.json({ message: "Overview o'chirildi" });
-  } catch (error) {
-    res.status(500).json({ message: "Serverda xatolik", error });
+export const deleteOverview = (req: Request, res: Response): void => {
+  const index = parseInt(req.params.id);
+  if (isNaN(index) || index < 0 || index >= overviews.length) {
+    res.status(404).json({ message: "Overview topilmadi" });
+    return;
   }
+
+  overviews.splice(index, 1);
+  res.json({ message: "Overview o‘chirildi" });
 };
