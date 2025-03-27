@@ -1,42 +1,51 @@
 import { Request, Response } from "express";
-import { Member } from "../models/member.model";
+import { IMember } from "../interfaces/member.interface";
 
-// 🔹 1. Barcha a'zolarni olish + Filtering
+let members: IMember[] = [];
+
 export const getAllMembers = async (req: Request, res: Response): Promise<void> => {
   try {
+    let filteredMembers = members;
+
     const { nationality, year, major, academicStatus } = req.query;
 
-    let filter: any = {};
-
     if (nationality) {
-      filter.nationality = { $regex: nationality, $options: "i" };
+      filteredMembers = filteredMembers.filter(member =>
+        member.nationality.toLowerCase().includes(String(nationality).toLowerCase())
+      );
     }
 
     if (year) {
-      filter.year = Number(year);
+      filteredMembers = filteredMembers.filter(member => member.year === Number(year));
     }
 
     if (major) {
-      filter.major = { $regex: major, $options: "i" };
+      filteredMembers = filteredMembers.filter(member =>
+        member.major.toLowerCase().includes(String(major).toLowerCase())
+      );
     }
 
     if (academicStatus) {
-      filter.academicStatus = academicStatus;
+      filteredMembers = filteredMembers.filter(member => member.academicStatus === academicStatus);
     }
 
-    const members = await Member.find(filter);
-    res.json(members);
+    res.json(filteredMembers);
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-// 🔹 2. Yangi a'zo qo'shish
 export const createMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, nationality, year, major, email, imageUrl, academicStatus } = req.body;
 
-    const newMember = new Member({
+    if (!fullName || !nationality || !year || !major || !email || !imageUrl || !academicStatus) {
+      res.status(400).json({ message: "Barcha maydonlar to‘ldirilishi shart!" });
+      return;
+    }
+
+    const newMember: IMember = {
+      id: String(Date.now()),
       fullName,
       nationality,
       year,
@@ -44,19 +53,18 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
       email,
       imageUrl,
       academicStatus,
-    });
+    };
 
-    await newMember.save();
+    members.push(newMember);
     res.status(201).json(newMember);
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-// 🔹 3. ID bo‘yicha a'zoni olish
 export const getMemberById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const member = await Member.findById(req.params.id);
+    const member = members.find(m => m.id === req.params.id);
     if (!member) {
       res.status(404).json({ message: "Member topilmadi" });
       return;
@@ -67,32 +75,32 @@ export const getMemberById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// 🔹 4. A'zoni yangilash
 export const updateMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updatedMember = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const index = members.findIndex(m => m.id === req.params.id);
 
-    if (!updatedMember) {
+    if (index === -1) {
       res.status(404).json({ message: "Member topilmadi" });
       return;
     }
 
-    res.json(updatedMember);
+    members[index] = { ...members[index], ...req.body };
+    res.json(members[index]);
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-// 🔹 5. A'zoni o‘chirish
 export const deleteMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deletedMember = await Member.findByIdAndDelete(req.params.id);
+    const index = members.findIndex(m => m.id === req.params.id);
 
-    if (!deletedMember) {
+    if (index === -1) {
       res.status(404).json({ message: "Member topilmadi" });
       return;
     }
 
+    members.splice(index, 1);
     res.json({ message: "Member o‘chirildi" });
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
