@@ -3,7 +3,7 @@ export interface IOverview {
   title: string;
   introduction: string[];
   conclusion: string[];
-  researchFocus: {
+  research_focus: {
     category: string;
     details: string[];
   }[];
