@@ -3,39 +3,26 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const createTableIfNotExists = async () => {
-  const checkTableQuery = `
-    SELECT * 
-    FROM information_schema.tables 
-    WHERE table_name = 'overviews';
+const createTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS overviews (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      introduction TEXT,
+      conclusion TEXT,
+      research_focus JSONB,
+      image_gallery JSONB
+    );
   `;
 
   try {
-    // Jadval mavjudligini tekshirish
-    const result = await pool.query(checkTableQuery);
-
-    if (result.rows.length > 0) {
-      console.log("Jadval mavjud.");
-    } else {
-      // Jadval mavjud bo'lmasa, uni yaratish
-      const createTableQuery = `
-        CREATE TABLE overviews (
-          id SERIAL PRIMARY KEY,
-          title VARCHAR(255) NOT NULL,
-          introduction TEXT,
-          conclusion TEXT,
-          research_focus JSONB,
-          image_gallery JSONB
-        );
-      `;
-      
-      await pool.query(createTableQuery);
-      console.log("Jadval yaratildi.");
-    }
+    console.log("Creating table if it doesn't exist...");
+    await pool.query(createTableQuery);
+    console.log("Table created successfully (if not already existing).");
   } catch (error) {
-    console.error("Jadvalni tekshirishda xato:", error);
+    console.error("Error creating table:", error);
   }
 };
 
-// Jadvalni yaratish
-createTableIfNotExists();
+// Server ishga tushganda jadvalni yaratish
+createTable();

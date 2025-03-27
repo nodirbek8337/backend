@@ -7,5 +7,5 @@ export interface IOverview {
     category: string;
     details: string[];
   }[];
-  imageGallery: string[];
+  image_gallery: string[];
 }

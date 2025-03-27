@@ -11,7 +11,7 @@ app.use(cors());
 
 app.use("/api/overviews", overviewRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 1000;
 app.listen(PORT, () => {
   console.log(`🚀 Server ishga tushdi: ${process.env.RENDER_EXTERNAL_HOSTNAME || "localhost"}:${PORT}`);
 });

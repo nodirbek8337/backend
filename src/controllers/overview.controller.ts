@@ -28,12 +28,12 @@ export const getOverview = async (req: Request, res: Response): Promise<void> =>
 
 export const addOverview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, introduction, conclusion, research_focus, imageGallery } = req.body;
+    const { title, introduction, conclusion, research_focus, image_gallery } = req.body;
 
     const result = await pool.query(
-      `INSERT INTO overviews (title, introduction, conclusion, research_focus, imageGallery) 
+      `INSERT INTO overviews (title, introduction, conclusion, research_focus, image_gallery) 
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [title, introduction, conclusion, research_focus, imageGallery]
+      [title, introduction, conclusion, research_focus, image_gallery]
     );
 
     res.status(201).json(result.rows[0]);
@@ -46,12 +46,12 @@ export const addOverview = async (req: Request, res: Response): Promise<void> =>
 export const editOverview = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { title, introduction, conclusion, research_focus, imageGallery } = req.body;
+    const { title, introduction, conclusion, research_focus, image_gallery } = req.body;
 
     const result = await pool.query(
-      `UPDATE overviews SET title = $1, introduction = $2, conclusion = $3, research_focus = $4, imageGallery = $5 
+      `UPDATE overviews SET title = $1, introduction = $2, conclusion = $3, research_focus = $4, image_gallery = $5 
        WHERE id = $6 RETURNING *`,
-      [title, introduction, conclusion, research_focus, imageGallery, id]
+      [title, introduction, conclusion, research_focus, image_gallery, id]
     );
 
     if (result.rowCount === 0) {
