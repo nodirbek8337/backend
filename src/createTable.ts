@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const checkTableExists = async () => {
+const createTableIfNotExists = async () => {
   const checkTableQuery = `
     SELECT * 
     FROM information_schema.tables 
@@ -17,12 +17,25 @@ const checkTableExists = async () => {
     if (result.rows.length > 0) {
       console.log("Jadval mavjud.");
     } else {
-      console.log("Jadval mavjud emas.");
+      // Jadval mavjud bo'lmasa, uni yaratish
+      const createTableQuery = `
+        CREATE TABLE overviews (
+          id SERIAL PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          introduction TEXT,
+          conclusion TEXT,
+          research_focus JSONB,
+          image_gallery JSONB
+        );
+      `;
+      
+      await pool.query(createTableQuery);
+      console.log("Jadval yaratildi.");
     }
   } catch (error) {
     console.error("Jadvalni tekshirishda xato:", error);
   }
 };
 
-// Jadvalni tekshirish
-checkTableExists();
+// Jadvalni yaratish
+createTableIfNotExists();
