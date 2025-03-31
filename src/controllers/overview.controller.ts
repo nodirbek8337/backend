@@ -1,84 +1,90 @@
 import { Request, Response } from "express";
-import pool from "../database";
+import { Overview } from "../models/overview.model";
 
-export const getOverviews = async (req: Request, res: Response): Promise<void> => {
+// 🔹 1. Barcha Overview larni olish
+export const getAllOverviews = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await pool.query("SELECT * FROM overviews");
-    res.json(result.rows);
+    const overviews = await Overview.find();
+    res.json(overviews);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server xatosi" });
+    res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-export const getOverview = async (req: Request, res: Response): Promise<void> => {
+// 🔹 2. Yangi Overview qo'shish
+export const createOverview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-    const result = await pool.query("SELECT * FROM overviews WHERE id = $1", [id]);
-    if (result.rowCount === 0) {
+    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
+
+    const newOverview = new Overview({
+      title,
+      introduction: introduction || [], 
+      conclusion: conclusion || [], 
+      researchFocus: researchFocus || [], 
+      imageGallery: imageGallery || [] 
+    });
+
+    await newOverview.save();
+    res.status(201).json(newOverview);
+  } catch (error) {
+    res.status(500).json({ message: "Serverda xatolik", error });
+  }
+};
+
+// 🔹 3. ID bo‘yicha bitta Overview ni olish
+export const getOverviewById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const overview = await Overview.findById(req.params.id);
+    if (!overview) {
       res.status(404).json({ message: "Overview topilmadi" });
       return;
     }
-    res.json(result.rows[0]);
+    res.json(overview);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server xatosi" });
+    res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-export const addOverview = async (req: Request, res: Response): Promise<void> => {
+// 🔹 4. Overview ni yangilash
+export const updateOverview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, introduction, conclusion, research_focus, image_gallery } = req.body;
+    const { title, introduction, conclusion, researchFocus, imageGallery } = req.body;
 
-    const result = await pool.query(
-      `INSERT INTO overviews (title, introduction, conclusion, research_focus, image_gallery) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [title, introduction, conclusion, research_focus, image_gallery]
+    const updatedOverview = await Overview.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        introduction,
+        conclusion,
+        researchFocus,
+        imageGallery
+      },
+      { new: true }
     );
 
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server xatosi" });
-  }
-};
-
-export const editOverview = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const { title, introduction, conclusion, research_focus, image_gallery } = req.body;
-
-    const result = await pool.query(
-      `UPDATE overviews SET title = $1, introduction = $2, conclusion = $3, research_focus = $4, image_gallery = $5 
-       WHERE id = $6 RETURNING *`,
-      [title, introduction, conclusion, research_focus, image_gallery, id]
-    );
-
-    if (result.rowCount === 0) {
+    if (!updatedOverview) {
       res.status(404).json({ message: "Overview topilmadi" });
       return;
     }
 
-    res.json(result.rows[0]);
+    res.json(updatedOverview);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server xatosi" });
+    res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
 
-export const removeOverview = async (req: Request, res: Response): Promise<void> => {
+// 🔹 5. Overview ni o‘chirish
+export const deleteOverview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-    const result = await pool.query("DELETE FROM overviews WHERE id = $1", [id]);
-
-    if (result.rowCount === 0) {
+    const deletedOverview = await Overview.findByIdAndDelete(req.params.id);
+    
+    if (!deletedOverview) {
       res.status(404).json({ message: "Overview topilmadi" });
       return;
     }
 
-    res.json({ message: "Overview o‘chirildi" });
+    res.json({ message: "Overview o'chirildi" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server xatosi" });
+    res.status(500).json({ message: "Serverda xatolik", error });
   }
 };

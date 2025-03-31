@@ -1,36 +1,27 @@
-import pool from "../database";
-import { IOverview } from "../interfaces/overview.interface";
+import mongoose, { Schema, Document } from "mongoose";
 
-export const getAllOverviews = async (): Promise<IOverview[]> => {
-  const { rows } = await pool.query("SELECT * FROM overviews");
-  return rows;
-};
+export interface IOverview extends Document {
+  title?: string; 
+  introduction?: string[]; 
+  conclusion?: string[]; 
+  researchFocus?: {
+    category?: string; 
+    details?: string[]; 
+  }[];
+  imageGallery?: string[];
+}
 
-export const getOverviewById = async (id: number): Promise<IOverview | null> => {
-  const { rows } = await pool.query("SELECT * FROM overviews WHERE id = $1", [id]);
-  return rows.length ? rows[0] : null;
-};
+const OverviewSchema: Schema = new Schema({
+  title: { type: String, default: null }, 
+  introduction: [{ type: String, default: null }], 
+  conclusion: [{ type: String, default: null }], 
+  researchFocus: [
+    {
+      category: { type: String, default: null }, 
+      details: [{ type: String, default: null }], 
+    },
+  ],
+  imageGallery: [{ type: String, default: null }]
+});
 
-export const createOverview = async (overview: IOverview): Promise<IOverview> => {
-  const { title, introduction, conclusion, research_focus, image_gallery } = overview;
-  const { rows } = await pool.query(
-    `INSERT INTO overviews (title, introduction, conclusion, research_focus, image_gallery)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [title, JSON.stringify(introduction), JSON.stringify(conclusion), JSON.stringify(research_focus), JSON.stringify(image_gallery)]
-  );
-  return rows[0];
-};
-
-export const updateOverview = async (id: number, overview: IOverview): Promise<IOverview | null> => {
-  const { title, introduction, conclusion, research_focus, image_gallery } = overview;
-  const { rows } = await pool.query(
-    `UPDATE overviews SET title = $1, introduction = $2, conclusion = $3, research_focus = $4, image_gallery = $5 WHERE id = $6 RETURNING *`,
-    [title, JSON.stringify(introduction), JSON.stringify(conclusion), JSON.stringify(research_focus), JSON.stringify(image_gallery), id]
-  );
-  return rows.length ? rows[0] : null;
-};
-
-export const deleteOverview = async (id: number): Promise<boolean> => {
-  const { rowCount } = await pool.query("DELETE FROM overviews WHERE id = $1", [id]);
-  return (rowCount || 0) > 0;
-};
+export const Overview = mongoose.model<IOverview>("Overview", OverviewSchema);
