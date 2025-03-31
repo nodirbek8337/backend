@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import { dbConnect } from "./config/database.config";
 import mongoose from "mongoose";
 import overviewRoutes from "./routes/overview.routes";
 import contactRoutes from "./routes/contact.routes";
@@ -13,10 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("✅ MongoDB ulanishi muvaffaqiyatli"))
-  .catch((err) => console.log("❌ MongoDB ulanishida xatolik:", err));
+dbConnect();
 
 app.use("/api/overviews", overviewRoutes);
 app.use("/api/contacts", contactRoutes);
