@@ -33,38 +33,38 @@ export interface IProfessor extends Document {
 }
 
 const ProfessorSchema: Schema = new Schema({
-  fullName: { type: String, required: true },
-  type: { type: String, enum: ["regular", "industrial", "collaboration", "visiting"], required: true },
-  position: { type: String, required: true },
-  department: { type: String, required: true },
-  university: { type: String, required: true },
-  researchAreas: [{ type: String, required: true }],
+  fullName: { type: String, required: false },
+  type: { type: String, enum: ["regular", "industrial", "collaboration", "visiting"], required: false },
+  position: { type: String, required: false },
+  department: { type: String, required: false },
+  university: { type: String, required: false },
+  researchAreas: [{ type: String, required: false }],
   contact: {
-    address: { type: String, required: true },
-    email: { type: String, required: true },
+    address: { type: String, required: false },
+    email: { type: String, required: false },
     officePhone: { type: String, required: false },
     officeFax: { type: String, required: false },
     cellPhone: { type: String, required: false },
   },
   education: [
     {
-      year: { type: String, required: true },
-      university: { type: String, required: true },
-      major: { type: String, required: true },
-      degree: { type: String, required: true },
+      year: { type: String, required: false },
+      university: { type: String, required: false },
+      major: { type: String, required: false },
+      degree: { type: String, required: false },
     },
   ],
   career: [
     {
-      year: { type: String, required: true },
-      position: { type: String, required: true },
-      university: { type: String, required: true },
+      year: { type: String, required: false },
+      position: { type: String, required: false },
+      university: { type: String, required: false },
     },
   ],
   awards: [
     {
-      year: { type: String, required: true },
-      title: { type: String, required: true },
+      year: { type: String, required: false },
+      title: { type: String, required: false },
     },
   ],
   imageUrl: { type: String, required: false },
