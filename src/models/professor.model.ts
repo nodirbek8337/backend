@@ -13,6 +13,7 @@ export interface IProfessor extends Document {
     officePhone?: string;
     officeFax?: string;
     cellPhone?: string;
+    period?: string;
   };
   education: {
     year: string;
@@ -45,6 +46,7 @@ const ProfessorSchema: Schema = new Schema({
     officePhone: { type: String, required: false },
     officeFax: { type: String, required: false },
     cellPhone: { type: String, required: false },
+    period: { type: String, required: false },
   },
   education: [
     {
