@@ -9,6 +9,7 @@ export interface IMember extends Document {
   email: string;
   imageUrl: string;
   academicStatus: "alumni" | "undergraduate" | "master-candidate" | "phd-candidate" | "post-doc";
+  researchAreas: string[];
 }
 
 const MemberSchema: Schema = new Schema({
@@ -20,6 +21,7 @@ const MemberSchema: Schema = new Schema({
   email: { type: String, required: false },
   imageUrl: { type: String, required: false },
   academicStatus: { type: String, enum: ["alumni", "undergraduate", "master-candidate", "phd-candidate", "post-doc"], required: false },
+  researchAreas: [{ type: String, required: false }],
 });
 
 export const Member = mongoose.model<IMember>("Member", MemberSchema);

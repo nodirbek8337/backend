@@ -4,7 +4,7 @@ import { Member } from "../models/member.model";
 // 🔹 1. Barcha a'zolarni olish + Filtering
 export const getAllMembers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nationality, researchGroup, year, major, academicStatus } = req.query;
+    const { nationality, researchGroup, year, major, academicStatus, researchAreas } = req.query;
 
     let filter: any = {};
 
@@ -28,6 +28,10 @@ export const getAllMembers = async (req: Request, res: Response): Promise<void> 
       filter.academicStatus = academicStatus;
     }
 
+    if (researchAreas) {
+      filter.researchAreas = { $in: researchAreas.toString().split(",") };
+    }
+
     const members = await Member.find(filter);
     res.json(members);
   } catch (error) {
@@ -38,7 +42,7 @@ export const getAllMembers = async (req: Request, res: Response): Promise<void> 
 // 🔹 2. Yangi a'zo qo'shish
 export const createMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, nationality, researchGroup, year, major, email, imageUrl, academicStatus } = req.body;
+    const { fullName, nationality, researchGroup, year, major, email, imageUrl, academicStatus, researchAreas } = req.body;
 
     const newMember = new Member({
       fullName,
@@ -49,6 +53,7 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
       email,
       imageUrl,
       academicStatus,
+      researchAreas: researchAreas || [],
     });
 
     await newMember.save();
