@@ -4,12 +4,16 @@ import { Member } from "../models/member.model";
 // 🔹 1. Barcha a'zolarni olish + Filtering
 export const getAllMembers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nationality, year, major, academicStatus } = req.query;
+    const { nationality, researchGroup, year, major, academicStatus } = req.query;
 
     let filter: any = {};
 
     if (nationality) {
       filter.nationality = { $regex: nationality, $options: "i" };
+    }
+
+    if (researchGroup) {
+      filter.researchGroup = { $regex: researchGroup, $options: "i" }; 
     }
 
     if (year) {
@@ -34,11 +38,12 @@ export const getAllMembers = async (req: Request, res: Response): Promise<void> 
 // 🔹 2. Yangi a'zo qo'shish
 export const createMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, nationality, year, major, email, imageUrl, academicStatus } = req.body;
+    const { fullName, nationality, researchGroup, year, major, email, imageUrl, academicStatus } = req.body;
 
     const newMember = new Member({
       fullName,
       nationality,
+      researchGroup,
       year,
       major,
       email,
