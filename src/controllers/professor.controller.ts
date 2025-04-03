@@ -3,14 +3,17 @@ import { Professor } from "../models/professor.model";
 
 export const getAllProfessors = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { type, fullName, university, researchAreas } = req.query;
+    const { type, fullName, university, nationality, researchGroup, researchAreas, website } = req.query;
 
     let filter: any = {};
 
     if (type) filter.type = type;
     if (fullName) filter.fullName = { $regex: fullName, $options: "i" }; 
     if (university) filter.university = { $regex: university, $options: "i" };
+    if (nationality) filter.nationality = { $regex: nationality, $options: "i" };
+    if (researchGroup) filter.researchGroup = { $regex: researchGroup, $options: "i" };
     if (researchAreas) filter.researchAreas = { $in: researchAreas.toString().split(",") };
+    if (website) filter.website = { $regex: website, $options: "i" };
 
     const professors = await Professor.find(filter);
     res.json(professors);
@@ -21,7 +24,7 @@ export const getAllProfessors = async (req: Request, res: Response): Promise<voi
 
 export const createProfessor = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, type, position, department, university, researchAreas, contact, education, career, awards, imageUrl } = req.body;
+    const { fullName, type, position, department, university, nationality, researchGroup, researchAreas, website, contact, education, career, awards, imageUrl } = req.body;
 
     const newProfessor = new Professor({
       fullName,
@@ -29,7 +32,10 @@ export const createProfessor = async (req: Request, res: Response): Promise<void
       position,
       department,
       university,
+      nationality,
+      researchGroup,
       researchAreas: researchAreas || [],
+      website,
       contact: contact || {},
       education: education || [],
       career: career || [],

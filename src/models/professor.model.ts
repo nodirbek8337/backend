@@ -6,7 +6,10 @@ export interface IProfessor extends Document {
   position: string;
   department: string;
   university: string;
+  nationality: string,
+  researchGroup: string,
   researchAreas: string[];
+  website: string;
   contact: {
     address: string;
     email: string;
@@ -39,7 +42,10 @@ const ProfessorSchema: Schema = new Schema({
   position: { type: String, required: false },
   department: { type: String, required: false },
   university: { type: String, required: false },
+  nationality: { type: String, required: false },
+  researchGroup: { type: String, required: false },
   researchAreas: [{ type: String, required: false }],
+  website: { type: String, required: false },
   contact: {
     address: { type: String, required: false },
     email: { type: String, required: false },
