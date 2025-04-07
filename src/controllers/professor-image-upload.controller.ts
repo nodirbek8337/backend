@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ProfessorImageUpload } from "../models/professor-image-upload.model";
+import { Professor } from "../models/professor.model";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const CHUNK_SIZE = 256 * 1024; 
@@ -38,7 +39,10 @@ export const uploadProfessorImage = async (req: Request, res: Response): Promise
       }).save();
     }
 
-    res.status(201).json({ message: "Rasm muvaffaqiyatli yuklandi" });
+    const imageUrl = `${req.protocol}://${req.get("host")}/api/professor-image-upload/${professorId}`;
+    await Professor.findByIdAndUpdate(professorId, { imageUrl });
+
+    res.status(201).json({ message: "Rasm muvaffaqiyatli yuklandi va professorga bog‘landi" });
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
   }
