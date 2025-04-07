@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { ProfessorImageUpload } from "../models/professor-image-upload.model";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const CHUNK_SIZE = 256 * 1024; // 256KB
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const CHUNK_SIZE = 256 * 1024; 
 
 export const uploadProfessorImage = async (req: Request, res: Response): Promise<void> => {
   try {
