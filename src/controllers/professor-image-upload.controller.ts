@@ -11,6 +11,12 @@ export const uploadProfessorImage = async (req: Request, res: Response): Promise
       return;
     }
 
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedMimeTypes.includes(req.file.mimetype)) {
+      res.status(400).json({ message: "Faqat JPG, JPEG yoki PNG ruxsat etiladi" });
+      return;
+    }
+
     const { professorId } = req.body;
     const fileBuffer = req.file.buffer;
 
@@ -28,6 +34,7 @@ export const uploadProfessorImage = async (req: Request, res: Response): Promise
         professorId,
         chunkIndex: i,
         data: chunk,
+        mimetype: i === 0 ? req.file.mimetype : undefined, 
       }).save();
     }
 
@@ -48,9 +55,22 @@ export const getProfessorImage = async (req: Request, res: Response): Promise<vo
     }
 
     const fullImage = Buffer.concat(chunks.map(chunk => chunk.data));
-    res.contentType("image/jpeg"); // png bo‘lsa "image/png" qil
+    const mimeType = chunks[0].mimetype || "image/jpeg";
+
+    res.contentType(mimeType);
     res.send(fullImage);
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik", error });
   }
 };
+
+export const deleteProfessorImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { professorId } = req.params;
+    await ProfessorImageUpload.deleteMany({ professorId });
+    res.json({ message: "Rasm o‘chirildi" });
+  } catch (error) {
+    res.status(500).json({ message: "Serverda xatolik", error });
+  }
+};
+
