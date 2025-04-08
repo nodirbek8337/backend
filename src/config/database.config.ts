@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 export const dbConnect = async (): Promise<void> => {
   try {
     const mongoUrl = process.env.MONGO_URL;
-    console.log("🔍 MONGO_URL:", mongoUrl); 
 
     if (!mongoUrl) {
       throw new Error("MONGO_URL muhit o'zgaruvchisi aniqlanmagan");
