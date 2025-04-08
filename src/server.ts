@@ -25,7 +25,7 @@ app.use("/api/members", memberRoutes);
 app.use("/api/professor-image-upload", professorImageRoutes);
 app.use("/api/member-image-upload", memberImageRoutes);
 
-const PORT = process.env.PORT || 1000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server http://localhost:${PORT} da ishlamoqda`);
 });
